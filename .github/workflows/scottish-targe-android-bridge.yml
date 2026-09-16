@@ -15,6 +15,9 @@ jobs:
       - name: Expand bridge source snapshot
         run: unzip -o scottish-targe/android-bridge-ci.zip -d .
 
+      - name: Enable AndroidX
+        run: echo 'android.useAndroidX=true' > android-bridge/gradle.properties
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
