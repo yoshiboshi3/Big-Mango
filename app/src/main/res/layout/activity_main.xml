@@ -1,0 +1,28 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#000000" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="24dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="XREAL Canvas" android:textColor="#FFFFFF" android:textSize="30sp" android:textStyle="bold"/>
+        <TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="Looking for an external display…" android:textColor="#9BA7B4" android:textSize="16sp"/>
+        <TextView android:id="@+id/scaleLabel" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="30dp" android:text="Scale 70%" android:textColor="#FFFFFF" android:textSize="18sp"/>
+        <SeekBar android:id="@+id/scale" android:layout_width="match_parent" android:layout_height="48dp" android:max="80" android:progress="50"/>
+        <TextView android:id="@+id/xLabel" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="18dp" android:text="X 0" android:textColor="#FFFFFF" android:textSize="18sp"/>
+        <SeekBar android:id="@+id/x" android:layout_width="match_parent" android:layout_height="48dp" android:max="200" android:progress="100"/>
+        <TextView android:id="@+id/yLabel" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="18dp" android:text="Y 0" android:textColor="#FFFFFF" android:textSize="18sp"/>
+        <SeekBar android:id="@+id/y" android:layout_width="match_parent" android:layout_height="48dp" android:max="200" android:progress="100"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:orientation="horizontal">
+            <Button android:id="@+id/center" android:layout_width="0dp" android:layout_height="56dp" android:layout_weight="1" android:text="CENTER"/>
+            <Space android:layout_width="12dp" android:layout_height="1dp"/>
+            <Button android:id="@+id/reset" android:layout_width="0dp" android:layout_height="56dp" android:layout_weight="1" android:text="RESET"/>
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="28dp"
+            android:text="v0.1 test: the glasses should show only a black field plus the outlined test window. Move and resize it here."
+            android:textColor="#9BA7B4" android:textSize="14sp"/>
+    </LinearLayout>
+</ScrollView>
