@@ -33,6 +33,12 @@ jobs:
         run: |
           set -o pipefail
           gradle -p android-bridge :bridge:testDebugUnitTest --stacktrace 2>&1 | tee bridge-test.log
+          status=${PIPESTATUS[0]}
+          echo '## Gradle diagnostic' >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          tail -120 bridge-test.log >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit $status
 
       - name: Upload Gradle diagnostic log
         if: always()
