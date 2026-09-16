@@ -8,6 +8,9 @@ on:
       - ".github/workflows/scottish-targe-android-bridge.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   bridge:
     runs-on: ubuntu-latest
@@ -48,9 +51,18 @@ jobs:
           path: bridge-test.log
           if-no-files-found: error
 
-      - name: Stop if bridge tests failed
+      - name: Publish diagnostic branch if bridge tests failed
         if: steps.bridge_tests.outcome == 'failure'
-        run: exit 1
+        shell: bash
+        run: |
+          mkdir -p ci
+          cp bridge-test.log ci/last-gradle-error.txt
+          git config user.name "Scottish Targe CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f ci/last-gradle-error.txt
+          git commit -m "ci: capture Scottish Targe Gradle failure"
+          git push --force origin HEAD:ci-diagnostics
+          exit 1
 
       - name: Build bridge AAR
         run: gradle -p android-bridge :bridge:assembleDebug --stacktrace
