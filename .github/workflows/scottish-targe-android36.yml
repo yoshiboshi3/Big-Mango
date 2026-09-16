@@ -1,0 +1,37 @@
+name: Scottish Targe Android 36 Supplement
+
+on:
+  push:
+    branches: ["scottish-targe-proof"]
+    paths:
+      - ".github/workflows/scottish-targe-android36.yml"
+  workflow_dispatch:
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+    steps:
+      - name: Verify Godot 4.7 Android 36 dependencies
+        run: |
+          set -euxo pipefail
+          test -d "$ANDROID_HOME/build-tools/36.1.0"
+          test -f "$ANDROID_HOME/platforms/android-36/android.jar"
+          "$ANDROID_HOME/build-tools/36.1.0/aapt2" version
+
+      - name: Bundle Android 36 supplement
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/st-android36
+          tar -C "$ANDROID_HOME" -czf /tmp/st-android36/android-sdk-36-supplement.tar.gz \
+            build-tools/36.1.0 platforms/android-36
+          du -h /tmp/st-android36/android-sdk-36-supplement.tar.gz
+
+      - name: Upload Android 36 supplement
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-Android-SDK-36-Supplement
+          path: /tmp/st-android36/android-sdk-36-supplement.tar.gz
+          compression-level: 0
+          if-no-files-found: error
