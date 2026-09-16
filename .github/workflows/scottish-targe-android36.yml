@@ -35,3 +35,5 @@ jobs:
           path: /tmp/st-android36/android-sdk-36-supplement.tar.gz
           compression-level: 0
           if-no-files-found: error
+
+# Triggered after the workflow was present on the branch so the push event is recognized.
