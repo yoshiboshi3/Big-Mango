@@ -121,23 +121,28 @@ jobs:
           curl -L --retry 4 --fail -o /tmp/scottish-toolchain/shizuku/provider-13.1.5.aar \
             https://repo1.maven.org/maven2/dev/rikka/shizuku/provider/13.1.5/provider-13.1.5.aar
 
-      - name: Assemble offline toolchain bundle
+      - name: Assemble slim offline toolchain bundle
         run: |
           set -euxo pipefail
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.7.stable"
           mkdir -p /tmp/scottish-toolchain/bin /tmp/scottish-toolchain/godot/export_templates/4.7.stable
           cp /usr/local/bin/godot /tmp/scottish-toolchain/bin/godot
-          cp -a "$HOME/.local/share/godot/export_templates/4.7.stable/." /tmp/scottish-toolchain/godot/export_templates/4.7.stable/
-          cp -a "$HOME/.gradle" /tmp/scottish-toolchain/gradle-home
+          for f in android_debug.apk android_release.apk android_source.zip version.txt; do
+            test -s "$TEMPLATE_DIR/$f"
+            cp "$TEMPLATE_DIR/$f" /tmp/scottish-toolchain/godot/export_templates/4.7.stable/
+          done
+          tar -C "$HOME" -I 'zstd -6 -T0' -cf /tmp/scottish-toolchain/gradle-home.tar.zst .gradle
           tar -C "$ANDROID_HOME" -czf /tmp/scottish-toolchain/android-sdk-35.tar.gz \
             platform-tools build-tools/35.0.1 platforms/android-35 cmdline-tools/latest licenses
+          tar -C "$JAVA_HOME" -czf /tmp/scottish-toolchain/jdk17.tar.gz .
           cp "$HOME/.config/godot/editor_settings-4.7.tres" /tmp/scottish-toolchain/editor_settings-4.7.tres
           printf 'Godot: '; /tmp/scottish-toolchain/bin/godot --version
           du -sh /tmp/scottish-toolchain/*
 
-      - name: Upload offline toolchain
+      - name: Upload slim offline toolchain
         uses: actions/upload-artifact@v4
         with:
-          name: Scottish-Targe-Godot-Offline-Toolchain
+          name: Scottish-Targe-Godot-Offline-Toolchain-Slim
           path: /tmp/scottish-toolchain
           compression-level: 0
           if-no-files-found: error
