@@ -18,6 +18,15 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Expand bridge source snapshot
+        run: unzip -o scottish-targe/android-bridge-ci.zip -d .
+
+      - name: Restore app-aware Gradle configuration
+        run: git checkout -- android-bridge/build.gradle.kts android-bridge/settings.gradle.kts
+
+      - name: Enable AndroidX
+        run: echo 'android.useAndroidX=true' > android-bridge/gradle.properties
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
