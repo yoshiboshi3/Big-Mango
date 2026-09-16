@@ -1,0 +1,37 @@
+name: Scottish Targe Godot Binary
+
+on:
+  push:
+    branches: ["scottish-targe-proof"]
+    paths:
+      - ".github/workflows/scottish-targe-godot-bin.yml"
+  workflow_dispatch:
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Godot 4.7 and public helper libraries
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/st/bin /tmp/st/public /tmp/st/shizuku
+          curl -L --retry 4 --fail -o /tmp/godot.zip \
+            https://github.com/godotengine/godot-builds/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp/st/bin
+          mv /tmp/st/bin/Godot_v4.7-stable_linux.x86_64 /tmp/st/bin/godot
+          chmod +x /tmp/st/bin/godot
+          /tmp/st/bin/godot --version
+          curl -L --retry 4 --fail -o /tmp/st/public/godot-xreal-v1.2.4.zip \
+            https://github.com/shiena/godot-xreal/releases/download/v1.2.4/godot-xreal-v1.2.4.zip
+          curl -L --retry 4 --fail -o /tmp/st/shizuku/api-13.1.5.aar \
+            https://repo1.maven.org/maven2/dev/rikka/shizuku/api/13.1.5/api-13.1.5.aar
+          curl -L --retry 4 --fail -o /tmp/st/shizuku/provider-13.1.5.aar \
+            https://repo1.maven.org/maven2/dev/rikka/shizuku/provider/13.1.5/provider-13.1.5.aar
+
+      - name: Upload Godot binary bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-Godot-Binary-Fast
+          path: /tmp/st
+          compression-level: 0
+          if-no-files-found: error
