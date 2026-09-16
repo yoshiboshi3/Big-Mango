@@ -121,7 +121,7 @@ jobs:
           curl -L --retry 4 --fail -o /tmp/scottish-toolchain/shizuku/provider-13.1.5.aar \
             https://repo1.maven.org/maven2/dev/rikka/shizuku/provider/13.1.5/provider-13.1.5.aar
 
-      - name: Assemble slim offline toolchain bundle
+      - name: Assemble split offline toolchain
         run: |
           set -euxo pipefail
           TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.7.stable"
@@ -132,6 +132,7 @@ jobs:
             cp "$TEMPLATE_DIR/$f" /tmp/scottish-toolchain/godot/export_templates/4.7.stable/
           done
           tar -C "$HOME" -I 'zstd -6 -T0' -cf /tmp/scottish-toolchain/gradle-home.tar.zst .gradle
+          split -b 300M -d -a 1 /tmp/scottish-toolchain/gradle-home.tar.zst /tmp/scottish-toolchain/gradle-part-
           tar -C "$ANDROID_HOME" -czf /tmp/scottish-toolchain/android-sdk-35.tar.gz \
             platform-tools build-tools/35.0.1 platforms/android-35 cmdline-tools/latest licenses
           tar -C "$JAVA_HOME" -czf /tmp/scottish-toolchain/jdk17.tar.gz .
@@ -139,10 +140,62 @@ jobs:
           printf 'Godot: '; /tmp/scottish-toolchain/bin/godot --version
           du -sh /tmp/scottish-toolchain/*
 
-      - name: Upload slim offline toolchain
+      - name: Upload Godot binary and public helper libraries
         uses: actions/upload-artifact@v4
         with:
-          name: Scottish-Targe-Godot-Offline-Toolchain-Slim
-          path: /tmp/scottish-toolchain
+          name: ST-Godot-Binary
+          path: |
+            /tmp/scottish-toolchain/bin
+            /tmp/scottish-toolchain/public
+            /tmp/scottish-toolchain/shizuku
+            /tmp/scottish-toolchain/editor_settings-4.7.tres
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload Godot Android templates
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-Godot-Templates
+          path: /tmp/scottish-toolchain/godot
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload Android SDK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-Android-SDK-35
+          path: /tmp/scottish-toolchain/android-sdk-35.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload JDK 17
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-JDK17
+          path: /tmp/scottish-toolchain/jdk17.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload Gradle cache part 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-Gradle-0
+          path: /tmp/scottish-toolchain/gradle-part-0
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload Gradle cache part 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-Gradle-1
+          path: /tmp/scottish-toolchain/gradle-part-1
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload Gradle cache part 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: ST-Gradle-2
+          path: /tmp/scottish-toolchain/gradle-part-2
           compression-level: 0
           if-no-files-found: error
