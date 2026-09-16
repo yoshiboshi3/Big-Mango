@@ -10,6 +10,9 @@ on:
 jobs:
   bundle:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -20,13 +23,15 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android 35 packages
+      - name: Verify preinstalled Android 35 toolchain
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "build-tools;35.0.1" "platforms;android-35" "cmdline-tools;latest"
+          set -euxo pipefail
+          test -x "$ANDROID_HOME/platform-tools/adb"
+          test -d "$ANDROID_HOME/build-tools/35.0.1"
+          test -f "$ANDROID_HOME/platforms/android-35/android.jar"
+          test -d "$ANDROID_HOME/cmdline-tools/latest"
+          "$ANDROID_HOME/platform-tools/adb" version
+          "$ANDROID_HOME/build-tools/35.0.1/aapt2" version
 
       - name: Download Godot 4.7 stable and Android export templates
         run: |
