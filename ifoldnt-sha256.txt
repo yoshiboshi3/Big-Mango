@@ -1,0 +1,1 @@
+3ab0da9b697f93c8c43fde6978b4d0d35d41cdaf493225e2606610e19393cf23  ifoldnt/app/build/outputs/apk/debug/app-debug.apk
