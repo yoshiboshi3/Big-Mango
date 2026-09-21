@@ -1,0 +1,84 @@
+name: Build iFoldnt v0.1
+
+on:
+  push:
+    branches: [ "ifoldnt-v0.1-build" ]
+    paths:
+      - "ifoldnt/**"
+      - ".github/workflows/ifoldnt-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ifoldnt-v0.1-build
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Build debug APK
+        working-directory: ifoldnt
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Verify APK and forbidden permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="ifoldnt/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          BT="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          "$BT/aapt" dump badging "$APK" | tee ifoldnt-badging.txt
+          "$BT/apksigner" verify --verbose "$APK" | tee ifoldnt-signature.txt
+          "$BT/aapt" dump permissions "$APK" | tee ifoldnt-permissions.txt
+          grep -F "package: name='com.ifoldnt'" ifoldnt-badging.txt
+          ! grep -Eq 'android.permission.(INTERNET|CAMERA|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE|BIND_ACCESSIBILITY_SERVICE)' ifoldnt-permissions.txt
+          sha256sum "$APK" | tee ifoldnt-sha256.txt
+
+      - name: Package deliverables
+        shell: bash
+        run: |
+          cp ifoldnt/app/build/outputs/apk/debug/app-debug.apk iFoldnt-v0.1-debug.apk
+          (cd ifoldnt && zip -qr ../iFoldnt-v0.1-source.zip . -x 'app/build/*' '.gradle/*')
+          ls -lh iFoldnt-v0.1-debug.apk iFoldnt-v0.1-source.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iFoldnt-v0.1
+          path: |
+            iFoldnt-v0.1-debug.apk
+            iFoldnt-v0.1-source.zip
+            ifoldnt-badging.txt
+            ifoldnt-signature.txt
+            ifoldnt-permissions.txt
+            ifoldnt-sha256.txt
+
+      - name: Commit built APK to build branch
+        shell: bash
+        run: |
+          git config user.name "iFoldnt build bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f iFoldnt-v0.1-debug.apk iFoldnt-v0.1-source.zip ifoldnt-badging.txt ifoldnt-signature.txt ifoldnt-permissions.txt ifoldnt-sha256.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "build: publish iFoldnt v0.1 debug APK [skip ci]"
+            git push origin HEAD:ifoldnt-v0.1-build
+          fi
