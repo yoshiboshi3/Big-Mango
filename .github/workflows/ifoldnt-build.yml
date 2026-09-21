@@ -69,13 +69,3 @@ jobs:
             ifoldnt-permissions.txt
             ifoldnt-sha256.txt
 
-      - name: Commit built APK to build branch
-        shell: bash
-        run: |
-          git config user.name "iFoldnt build bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -f iFoldnt-v0.1-debug.apk iFoldnt-v0.1-source.zip ifoldnt-badging.txt ifoldnt-signature.txt ifoldnt-permissions.txt ifoldnt-sha256.txt
-          if ! git diff --cached --quiet; then
-            git commit -m "build: publish iFoldnt v0.1 debug APK [skip ci]"
-            git push origin HEAD:ifoldnt-v0.1-build
-          fi
