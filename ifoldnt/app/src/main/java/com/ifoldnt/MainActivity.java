@@ -101,7 +101,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         root.addView(text("Moving side", 14, true));
         RadioGroup sides = new RadioGroup(this);
-        sides.setOrientation(RadioGroup.HORIZONTAL);
+        sides.setOrientation(RadioGroup.VERTICAL);
         RadioButton auto = radio("Witchcraft Auto", "AUTO".equals(Prefs.side(this)));
         RadioButton left = radio("Left", "LEFT".equals(Prefs.side(this)));
         RadioButton right = radio("Right", "RIGHT".equals(Prefs.side(this)));
@@ -127,7 +127,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         root.addView(text("Bevel preset", 14, true), margin(0, 14, 0, 0));
         RadioGroup presets = new RadioGroup(this);
-        presets.setOrientation(RadioGroup.HORIZONTAL);
+        presets.setOrientation(RadioGroup.VERTICAL);
         RadioButton subtle = radio("Subtle", "SUBTLE".equals(Prefs.bevelPreset(this)));
         RadioButton stupid = radio("Stupid", "STUPID".equals(Prefs.bevelPreset(this)));
         RadioButton maximum = radio("Maximum Courage", "MAXIMUM".equals(Prefs.bevelPreset(this)));
